@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        var categories = [];
+        var catvals = [];
+        var parts = [];
+        var partids = [];
+        $(document).ready(function(){
+            $("#btnAddCat").click(function(){
+                let catName = window.prompt("Category name:");
+                categories.push(catName);
+                let addPartHtml = catName + ": <input class='catInput' type='text' id='cat_"+catName+"'/> <br/>";
+                $("#addPartCats").append(addPartHtml);
+                $("#partHeadings").append("<th>"+catName+"</th>");
+                //$("#incHeadings").append("<th>"+catName+"</th>");
+                //$("#excHeadings").append("<th>"+catName+"</th>");
+                catvals.push([]);
+                //console.log(categories);
+            });
+
+            $("#btnAddPart").click(function(){
+                let id = $("#partNum").val();
+                let cats = $('.catInput').map(function() {
+                    return $(this).val();
+                }).toArray();
+                parts.push(cats);
+                partids.push(id);
+                //console.log(id);
+                //console.log(cats);
+                let tstring = "";
+                tstring += "<tr><td>"+id+"</td>";
+                cats.forEach(e => tstring += "<td>"+e+"</td>");
+                tstring += "</tr>";
+                $("#partList").append(tstring);
+                
+                
+                for(var i = 0; i < catvals.length; i++){
+                    console.log(i);
+                    if(catvals[i].indexOf(cats[i]) === -1) {
+                        catvals[i].push(cats[i]);
+                        
+                    }
+                }
+
+                $("#includes").empty();
+
+                let myStr = "";
+                for(var i = 0; i < catvals.length; i++){
+                    myStr += "<tr><th>"+categories[i]+"</th>";
+                    for (var j = 0; j < catvals[i].length; j++) {
+                        myStr += "<td>"+catvals[i][j]+"<input type='checkbox' class='incbox' id='inc_"+categories[i]+"_"+catvals[i][j]+"'/></td>";
+                    }
+                    myStr += "</tr>";
+                }
+
+                $("#includes").append(myStr);
+                $("#excludes").empty();
+                myStr = "";
+                for(var i = 0; i < catvals.length; i++){
+                    myStr += "<tr><th>"+categories[i]+"</th>";
+                    for (var j = 0; j < catvals[i].length; j++) {
+                        myStr += "<td>"+catvals[i][j]+"<input type='checkbox' class='excbox' id='exc_"+categories[i]+"_"+catvals[i][j]+"'/></td>";
+                    }
+                    myStr += "</tr>";
+                }
+
+                $("#excludes").append(myStr);
+                
+                //console.log(catvals);
+                // incstring = "";
+                // incstring += "<tr><td>"+id+"</td>";
+                // cats.forEach(e => tstring += "<td>"+e+"</td>");
+                // incstring += "</tr>";
+
+
+            });
+
+            $("#btnGenRule").click(function(){
+                let inc = [];
+
+                for(var i = 0; i < catvals.length; i++){
+                    inc.push([]);
+                    for (var j = 0; j < catvals[i].length; j++) {
+                        let checked = $("#inc_"+categories[i]+"_"+catvals[i][j]);
+                        console.log(checked);
+                        if (checked.is(":checked")){
+                            inc[i].push(catvals[i][j]);
+                        }
+                    }
+                    
+                }
+
+                let exc = [];
+
+                for(var i = 0; i < catvals.length; i++){
+                    exc.push([]);
+                    for (var j = 0; j < catvals[i].length; j++) {
+                        let checked = $("#exc_"+categories[i]+"_"+catvals[i][j]);
+                        console.log(checked);
+                        if (checked.is(":checked")){
+                            exc[i].push(catvals[i][j]);
+                        }
+                    }
+                    
+                }
+                //console.log(inc);
+                //console.log(exc);
+
+                let matched = [];
+                let matchedids = [];
+
+                for (let i=0; i<parts.length; i++){
+                    let match = true;
+                    for (let j=0; j<parts[i].length; j++) {
+                        if (inc[j].indexOf(parts[i][j]) === -1) {
+                            match = false;
+                        }
+                    }
+                    if (match) {
+                        matched.push(parts[i]);
+                        matchedids.push(partids[i]);
+                    }
+                }
+                console.log(matched);
+                console.log(matchedids);
+
+            });
+        });
+    </script>
+    </head>
+    <body>
+
+        <h1>RULEZ!!!</h1>
+        <h2>Categories</h2>
+        <h3>First, add some categories...</h3>
+        <div id="categories">
+            
+        </div>
+        <button id = "btnAddCat">Add Category</button>
+        <br/>
+        <br/>
+        <br/>
+        <div>
+            <h2>Add Parts</h2>
+            <div id="addPartCats">
+                partNum: <input type='text' id='partNum'/> <br/>
+            </div>
+            <button id = "btnAddPart">Add Part</button>
+        </div>
+        
+        <div>
+            <h2>Parts List</h2>
+            <table id = "partList">
+                
+                    <tr id = "partHeadings">
+                        <th>partNum</th>
+                    </tr>
+                
+            </table>
+            
+        </div>
+
+        <h2> Rule Builder </h2>
+        <h4> Include: </h4>
+        <div>
+            <table id = "includes">
+               
+            </table>
+        </div>
+        <h4> Exclude: </h4>
+        <div>
+            <table id="excludes">
+                
+            </table>
+        </div>
+
+        <button id="btnGenRule"> GENERATE RULE </button>
+
+
+    </body>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+        }
+    </style>
+
+</html>
